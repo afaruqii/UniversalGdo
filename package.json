@@ -1,7 +1,7 @@
 {
   "private":"true",
-  "displayName": "homebridge-universalGdo",
-  "name": "Universal Gdo",
+  "displayName": "Universal Gdo",
+  "name": "homebridge-universalgdo",
   "version": "1.0.0",
   "description": "A short description about what your plugin does.",
   "author": "afaruqii",
@@ -21,9 +21,9 @@
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint src/**.ts --max-warnings=0",
-    "watch": "npm run build && npm link && nodemon",
+    "watch": "npm run build && hb-service link && nodemon",
     "build": "rimraf ./dist && tsc",
-    "prepublishOnly": "npm run lint && npm run build"
+    "prepublishOnly": "npm run lint && npm run build" 
   },
   "keywords": [
     "chamberlain",

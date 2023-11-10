@@ -1,19 +1,21 @@
 {
-  "private": true,
-  "displayName": "Plugin Name",
-  "name": "homebridge-plugin-name",
+  "private":"true",
+  "displayName": "homebridge-universalGdo",
+  "name": "Universal Gdo",
   "version": "1.0.0",
   "description": "A short description about what your plugin does.",
+  "author": "afaruqii",
+  "url": "https://github.com/afaruqii/",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/USERNAME/GITHUB_PROJECT_NAME.git"
+    "url": "https://github.com/afaruqii/UniversalGdo"
   },
   "bugs": {
-    "url": "https://github.com/USERNAME/GITHUB_PROJECT_NAME/issues"
+    "url": "https://github.com/afaruqii/UniversalGdo/issues"
   },
   "engines": {
-    "node": "^18.17.0 || ^20.9.0",
+    "node": "^18.18.0 || ^20.9.0",
     "homebridge": "^1.6.0"
   },
   "main": "dist/index.js",
@@ -24,7 +26,20 @@
     "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
-    "homebridge-plugin"
+    "chamberlain",
+    "craftsman",
+    "door",
+    "garage",
+    "garage door",
+    "garage door opener",
+    "gate opener",
+    "gdo",
+    "homebridge",
+    "homebridge-plugin",
+    "liftmaster",
+    "mastercraft",
+    "myq",
+    "universal-garage"
   ],
   "dependencies": {},
   "devDependencies": {

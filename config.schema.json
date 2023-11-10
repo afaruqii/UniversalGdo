@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "ExampleHomebridgePlugin",
+  "pluginAlias": "UniversalGdo",
   "pluginType": "platform",
   "singular": true,
   "schema": {

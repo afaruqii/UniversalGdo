@@ -10,7 +10,7 @@ import { UniversalGarageDoorPlatform } from './platform';
 export class UniversalGarageDoorPlatformAccessory {
   private service: Service;
   private currentDoorState = this.platform.Characteristic.CurrentDoorState.CLOSED;
-  private doorTargetState = this.doorTargetStateBias(this.currentDoorState);
+  private doorTargetState = this.getTargetFromCurrent(this.currentDoorState);
 
   /**
    * These are just used to create a working example
@@ -25,7 +25,7 @@ export class UniversalGarageDoorPlatformAccessory {
 
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
-      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Default-Manufacturer')
+      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Chamberlain')
       .setCharacteristic(this.platform.Characteristic.Model, 'Default-Model')
       .setCharacteristic(this.platform.Characteristic.SerialNumber, 'Default-Serial');
 
@@ -42,13 +42,19 @@ export class UniversalGarageDoorPlatformAccessory {
     //*******************************************************************************//
     //****************************REGISTER HANDLERS**********************************//
     //*******************************************************************************//
+
     // register handlers for the CurrentDoorState Characteristic
-    this.service.getCharacteristic(this.platform.Characteristic.CurrentDoorState);
+    this.service.getCharacteristic(this.platform.Characteristic.CurrentDoorState)
+      .onGet(this.getCurrentDoorState.bind(this));
+
     // register handlers for the TargetDoorState Characteristic
-    //.onGet(this.getOn.bind(this));               // GET - bind to the `getOn` method below
-    this.service.getCharacteristic(this.platform.Characteristic.TargetDoorState);
+    this.service.getCharacteristic(this.platform.Characteristic.TargetDoorState)
+      .onGet(this.getTargetDoorState.bind(this))
+      .onSet(this.setTargetDoorState.bind(this));
+
     // register handlers for the ObstructionDetected Characteristic
-    this.service.getCharacteristic(this.platform.Characteristic.ObstructionDetected);
+    this.service.getCharacteristic(this.platform.Characteristic.ObstructionDetected)
+      .onGet(this.getObstructionDetected.bind(this));
 
 
     /**
@@ -62,34 +68,6 @@ export class UniversalGarageDoorPlatformAccessory {
      * can use the same sub type id.)
      */
 
-    // Example: add two "motion sensor" services to the accessory
-    const motionSensorOneService = this.accessory.getService('Motion Sensor One Name') ||
-      this.accessory.addService(this.platform.Service.MotionSensor, 'Motion Sensor One Name', 'YourUniqueIdentifier-1');
-
-    const motionSensorTwoService = this.accessory.getService('Motion Sensor Two Name') ||
-      this.accessory.addService(this.platform.Service.MotionSensor, 'Motion Sensor Two Name', 'YourUniqueIdentifier-2');
-
-    /**
-     * Updating characteristics values asynchronously.
-     *
-     * Example showing how to update the state of a Characteristic asynchronously instead
-     * of using the `on('get')` handlers.
-     * Here we change update the motion sensor trigger states on and off every 10 seconds
-     * the `updateCharacteristic` method.
-     *
-     */
-    let motionDetected = false;
-    setInterval(() => {
-      // EXAMPLE - inverse the trigger
-      motionDetected = !motionDetected;
-
-      // push the new value to HomeKit
-      motionSensorOneService.updateCharacteristic(this.platform.Characteristic.MotionDetected, motionDetected);
-      motionSensorTwoService.updateCharacteristic(this.platform.Characteristic.MotionDetected, !motionDetected);
-
-      this.platform.log.debug('Triggering motionSensorOneService:', motionDetected);
-      this.platform.log.debug('Triggering motionSensorTwoService:', !motionDetected);
-    }, 10000);
   }
 
   /**
@@ -127,6 +105,40 @@ export class UniversalGarageDoorPlatformAccessory {
     return currentState;
   }
 
+  async getTargetDoorState(): Promise<CharacteristicValue> {
+    const targetState = this.doorTargetState;
+
+    this.platform.log.debug('Get Characteristic On ->', targetState);
+
+    // if you need to return an error to show the device as "Not Responding" in the Home app:
+    // throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+
+    return targetState;
+  }
+
+  async setTargetDoorState(): Promise<CharacteristicValue> {
+    const targetState = this.doorTargetState;
+
+    this.platform.log.debug('Get Characteristic On ->', targetState);
+
+    // if you need to return an error to show the device as "Not Responding" in the Home app:
+    // throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+
+    return targetState;
+  }
+
+  async getObstructionDetected(): Promise<CharacteristicValue> {
+    const targetState = this.doorTargetState;
+
+    this.platform.log.debug('Get Characteristic On ->', targetState);
+
+    // if you need to return an error to show the device as "Not Responding" in the Home app:
+    // throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+
+    return targetState;
+  }
+
+
 
   // async getCurrentDoorState(): Promise<CharacteristicValue> {
 
@@ -142,9 +154,11 @@ export class UniversalGarageDoorPlatformAccessory {
 
   //   this.platform.log.debug('Set Characteristic Brightness -> ', value);
   // }
+  //*******************************************************************************//
+  //*******************************UTIL FUNCTIONS**********************************//
+  //*******************************************************************************//
 
-  private doorTargetStateBias(doorState: CharacteristicValue): CharacteristicValue {
-
+  private getTargetFromCurrent(doorState: CharacteristicValue): CharacteristicValue {
     switch(doorState) {
 
       case this.platform.Characteristic.CurrentDoorState.OPEN:
@@ -160,4 +174,5 @@ export class UniversalGarageDoorPlatformAccessory {
         break;
     }
   }
+
 }

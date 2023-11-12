@@ -1,5 +1,5 @@
-import { Service, PlatformAccessory, CharacteristicValue, PlatformConfig } from 'homebridge';
-import { doorConfig } from './doorConfig';
+import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
+
 
 import { UniversalGarageDoorPlatform } from './platform';
 

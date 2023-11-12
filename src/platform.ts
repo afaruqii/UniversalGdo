@@ -1,6 +1,8 @@
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
+import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, Logging } from 'homebridge';
 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
+import { platform } from 'os';
+import { doorConfig } from './doorConfig';
 import { UniversalGarageDoorPlatformAccessory } from './platformAccessory';
 
 /**
@@ -9,18 +11,23 @@ import { UniversalGarageDoorPlatformAccessory } from './platformAccessory';
  * parse the user config and discover/register accessories with Homebridge.
  */
 export class UniversalGarageDoorPlatform implements DynamicPlatformPlugin {
-  public readonly Service: typeof Service = this.api.hap.Service;
-  public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
-
-  // this is used to track restored cached accessories
+  public readonly api: API;
+  public readonly Service: typeof Service;
+  public readonly Characteristic: typeof Characteristic;
   public readonly accessories: PlatformAccessory[] = [];
+  public config!: doorConfig;
+  public readonly log: Logging;
+  private pollingTimer!: NodeJS.Timeout;
 
   constructor(
-    public readonly log: Logger,
-    public readonly config: PlatformConfig,
-    public readonly api: API,
+    log: Logging, config: PlatformConfig, api: API,
   ) {
-    this.log.debug('Finished initializing platform:', this.config.name);
+    this.accessories = [];
+    this.api = api;
+    this.log = log;
+    this.Service = this.api.hap.Service;
+    this.Characteristic = this.api.hap.Characteristic;
+    this.log.debug('Finished initializing platform:', platform.name);
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,
@@ -31,6 +38,17 @@ export class UniversalGarageDoorPlatform implements DynamicPlatformPlugin {
       // run the method to discover / register your devices as accessories
       this.discoverDevices();
     });
+
+    //need to be configured before starting
+    if(!config){
+      return;
+    }
+    this.config = {
+      serverIpAddress: config.serverIPAddress as string,
+      doorOneName: config.doorOneName as string,
+      doorTwoName: config.doorTwoName as string,
+    };
+
   }
 
   /**
@@ -56,12 +74,12 @@ export class UniversalGarageDoorPlatform implements DynamicPlatformPlugin {
     // or a user-defined array in the platform config.
     const exampleDevices = [
       {
-        exampleUniqueId: 'ABCD',
-        exampleDisplayName: 'Bedroom',
+        doorId: 1,
+        exampleDisplayName: this.config.doorOneName,
       },
       {
-        exampleUniqueId: 'EFGH',
-        exampleDisplayName: 'Kitchen',
+        doorId: 2,
+        exampleDisplayName: this.config.doorTwoName,
       },
     ];
 
@@ -71,7 +89,7 @@ export class UniversalGarageDoorPlatform implements DynamicPlatformPlugin {
       // generate a unique id for the accessory this should be generated from
       // something globally unique, but constant, for example, the device serial
       // number or MAC address
-      const uuid = this.api.hap.uuid.generate(device.exampleUniqueId);
+      const uuid = this.api.hap.uuid.generate(device.exampleDisplayName);
 
       // see if an accessory with the same uuid has already been registered and restored from
       // the cached devices we stored in the `configureAccessory` method above

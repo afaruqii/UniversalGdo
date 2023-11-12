@@ -5,21 +5,21 @@
   "schema": {
     "type": "object",
     "properties": {
-    "Server IP Address":{
-      "name":"ipAddress",
+    "serverIPAddress":{
       "type":"string",
+      "title": "Server IP Address",
       "required":true,
       "description": "Base path of your server. For a local device an IP address is sufficient"
     },
-      "Door 1 Name": {
-        "name": "doorOneName",
+      "doorOneName": {
+        "title": "Door 1 Name",
         "type": "string",
         "required": true,
         "description": "Set the Door name for display in the Home app."
       },
-      "Door 2 Name": {
-        "name": "doorTwoName",
+      "doorTwoName": {
         "type": "string",
+        "title": "Door 2 Name",
         "required": true,
         "description": "Set the Door name for display in the Home app."
       }
